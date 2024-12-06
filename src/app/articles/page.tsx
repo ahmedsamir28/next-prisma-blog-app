@@ -1,31 +1,7 @@
 // pages/articles.js
 
-import Link from "next/link";
 import ArticleCard from "../_Components/Articles/ArticleCard";
 
-const articles = [
-  {
-    title: "How to Build a React App",
-    description:
-      "In this article, we explore how to build a simple React application from scratch.",
-    date: "December 5, 2024",
-    link: "/article1",
-  },
-  {
-    title: "Next.js: The Ultimate Guide",
-    description:
-      "This comprehensive guide will teach you everything you need to know about Next.js and how to use it effectively.",
-    date: "November 25, 2024",
-    link: "/article2",
-  },
-  {
-    title: "Tailwind CSS Basics",
-    description:
-      "An introduction to Tailwind CSS, a utility-first CSS framework, and how to use it in your projects.",
-    date: "October 15, 2024",
-    link: "/article3",
-  },
-];
 
  function ArticlesPage() {
   return (
