@@ -1,31 +1,40 @@
-import prisma from "@/app/Utils/db";
 import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/app/Utils/db";
+import { verifyToken } from "@/app/Utils/verifyToken";
 
-/**
- *  @method  POST
- *  @route   /api/articles
- *  @desc    Create New Article
- *  @access  private 
- */
 export async function POST(request: NextRequest) {
     try {
+
+        const userData = verifyToken(request);
+
+        if (!userData || !userData.id) {
+            return NextResponse.json(
+                { message: 'only admin, access denied' },
+                { status: 403 }
+            );
+        }
+
+        // Extract the request body
         const body = await request.json();
+
+        // Validate the required fields
         if (!body.title || !body.description) {
             return NextResponse.json(
                 { error: "Missing required fields: title or description" },
-                { status: 400 })
+                { status: 400 }
+            );
         }
 
         const newArticle = await prisma.article.create({
             data: {
                 title: body.title,
                 description: body.description,
+                userId: userData.id,
             },
         });
 
         return NextResponse.json(newArticle, { status: 201 });
-    }
-    catch (error) {
+    } catch (error) {
         console.error("Error creating article:", error);
         return NextResponse.json(
             { error: "Internal Server Error" },
@@ -37,7 +46,7 @@ export async function POST(request: NextRequest) {
 /**
  *  @method  GET
  *  @route   /api/articles
- *  @desc    Create New Article
+ *  @desc    Fetch Articles
  *  @access  public 
  */
 

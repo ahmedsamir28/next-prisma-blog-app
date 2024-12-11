@@ -1,4 +1,5 @@
 import prisma from "@/app/Utils/db";
+import { verifyToken } from "@/app/Utils/verifyToken";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IProps {
@@ -17,6 +18,20 @@ export async function GET(req: NextRequest, { params }: IProps) {
 
         const article = await prisma.article.findUnique({
             where: { id: parseInt(id) },
+            include: {
+                comments: {
+                    include: {
+                        User: {
+                            select: {
+                                username: true,
+                            }
+                        }
+                    },
+                    orderBy: {
+                        createAt: 'desc'
+                    }
+                }
+            }
         });
 
         if (!article) {
@@ -42,6 +57,14 @@ export async function GET(req: NextRequest, { params }: IProps) {
 
 export async function PUT(req: NextRequest, { params }: IProps) {
     try {
+        const userData = verifyToken(req);
+        if (!userData || !userData.id) {
+            return NextResponse.json(
+                { message: 'only admin, access denied' },
+                { status: 403 }
+            );
+        }
+
         const article = await prisma.article.findUnique({
             where: { id: parseInt(params.id) },
         })
@@ -68,12 +91,23 @@ export async function PUT(req: NextRequest, { params }: IProps) {
 
 export async function DELETE(req: NextRequest, { params }: IProps) {
     try {
+        const userData = verifyToken(req);
+        if (!userData || !userData.id) {
+            return NextResponse.json(
+                { message: 'only admin, access denied' },
+                { status: 403 }
+            );
+        }
+
         const article = await prisma.article.findUnique({
             where: { id: parseInt(params.id) },
+            include: { comments: true }
+
         })
         if (!article) {
             return NextResponse.json({ message: 'article not foound' }, { status: 404 })
         }
+        
         //delete th article
         await prisma.article.delete({ where: { id: parseInt(params.id) } })
         return NextResponse.json({ message: 'article is deleted' }, { status: 204 })
