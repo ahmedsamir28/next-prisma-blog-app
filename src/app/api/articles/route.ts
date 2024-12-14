@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/Utils/db";
-import { verifyToken } from "@/app/Utils/verifyToken";
+// import { verifyToken } from "@/app/Utils/verifyToken";
 
 export async function POST(request: NextRequest) {
     try {
 
-        const userData = verifyToken(request);
+        // const userData = verifyToken(request);
 
-        if (!userData || !userData.id) {
-            return NextResponse.json(
-                { message: 'only admin, access denied' },
-                { status: 403 }
-            );
-        }
+        // if (!userData || !userData.id) {
+        //     return NextResponse.json(
+        //         { message: 'only admin, access denied' },
+        //         { status: 403 }
+        //     );
+        // }
 
         // Extract the request body
         const body = await request.json();
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
             data: {
                 title: body.title,
                 description: body.description,
-                userId: userData.id,
+                // userId: userData.id,
             },
         });
 

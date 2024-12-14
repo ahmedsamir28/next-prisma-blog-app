@@ -1,7 +1,7 @@
 import prisma from "@/app/Utils/db";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
-import { generateJWT } from "@/app/Utils/generateToken";
+import { setCookie } from "@/app/Utils/generateToken";
 import { loginSchema } from "@/app/Utils/validation";
 
 /**
@@ -47,11 +47,19 @@ export async function POST(req: NextRequest) {
         }
 
         // Generate JWT token
-        const token = generateJWT({ id: user.id, email: user.email });
+        const cookie = setCookie({
+            id: user.id,
+            email: user.email,
+            username: user.username
+        });
 
         return NextResponse.json(
-            { user, token, message: "Login successful" },
-            { status: 200 }
+            { user, message: "Login successful" },
+            {
+                status: 200,
+                headers: { "Set-Cookie": cookie }
+
+            }
         );
     } catch (error) {
         console.error("Error during login:", error);

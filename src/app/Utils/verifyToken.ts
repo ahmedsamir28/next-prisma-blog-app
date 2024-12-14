@@ -1,27 +1,31 @@
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { NextRequest, NextResponse } from "next/server";
+import jwt from 'jsonwebtoken';
+import { NextRequest } from 'next/server';
+import { JWTPayload } from './types';
 
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret";
-
-// Utility function to verify the JWT token
-export function verifyToken(request: NextRequest): JwtPayload | null {
+// Verify Token For API End Point
+export function verifyToken(request: NextRequest): JWTPayload | null {
     try {
-        // Get the JWT token from the Authorization header
-        const authHeader = request.headers.get("Authorization");
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return NextResponse.json(
-                { error: "Authentication required" },
-                { status: 401 }
-            );
-        }
+        const jwtToken = request.cookies.get("jwtToken");
+        const token = jwtToken?.value as string;
+        if (!token) return null;
 
-        const token = authHeader.split(" ")[1];
+        const privateKey = process.env.JWT_SECRET as string;
+        const userPayload = jwt.verify(token, privateKey) as JWTPayload;
 
-        const decoded = jwt.verify(token, JWT_SECRET);
-        if (typeof decoded === "object" && decoded !== null) {
-            return decoded as JwtPayload;
-        }
+        return userPayload;
+    } catch  {
         return null;
+    }
+}
+
+// Verify Token For Page
+export function verifyTokenForPage(token: string): JWTPayload | null {
+    try {
+        const privateKey = process.env.JWT_SECRET as string;
+        const userPayload = jwt.verify(token, privateKey) as JWTPayload;
+        if(!userPayload) return null;
+
+        return userPayload;
     } catch {
         return null;
     }

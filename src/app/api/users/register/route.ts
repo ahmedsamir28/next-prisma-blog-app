@@ -2,7 +2,7 @@ import prisma from "@/app/Utils/db";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 import { registerSchema } from "@/app/Utils/validation";
-import { generateJWT } from "@/app/Utils/generateToken";
+import { setCookie } from "@/app/Utils/generateToken";
 
 /**
  *  @method  POST
@@ -35,13 +35,19 @@ export async function POST(req: NextRequest) {
                 password: hashedPassword,
             },
         });
-        
-        // Generate JWT token
-        const token = generateJWT({ id: newUser.id, email: newUser.email }
-        )
+
+        const cookie = setCookie({
+            id: newUser.id,
+            email: newUser.email,
+            username: newUser.username
+        });
+
         return NextResponse.json(
-            { newUser, token, message: "Registered & Authenticated" },
-            { status: 201 }
+            { newUser, message: "Registered & Authenticated" },
+            {
+                status: 201,
+                headers: { "Set-Cookie": cookie }
+            }
         );
     } catch {
         return NextResponse.json(

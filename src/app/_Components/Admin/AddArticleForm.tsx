@@ -1,39 +1,71 @@
-"use client"
-import React, {  FormEvent, useState } from 'react'
+"use client";
+
+import React, { FormEvent, useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { DOMAIN } from "@/app/Utils/constants";
 
 function AddArticleForm() {
-    const [formData, setFormData] = useState({ title: "",content: "" });
+    const [formData, setFormData] = useState({ title: "", description: "" });
 
-    const handleSubmit = (e :FormEvent<HTMLFormElement>) => {
+    const onChangeHandler = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("Submitted Article:", formData);
-        setFormData({ title: "", content: "" });
+
+        try {
+            await axios.post(`${DOMAIN}/api/articles`, formData);
+            toast.success("Article added successfully!");
+            setFormData({ title: "", description: "" });
+
+        } catch {
+            toast.error("Failed to add the article. Please try again later.");
+        }
     };
 
     return (
         <div>
             <h2 className="text-xl font-bold mb-4">Add New Article</h2>
-            <form onSubmit={handleSubmit} className="space-y-4 ">
+            <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Title Field */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Title</label>
+                    <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                        Title
+                    </label>
                     <input
                         type="text"
+                        id="title"
+                        name="title"
                         className="w-full px-4 py-2 border rounded"
                         value={formData.title}
-                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        onChange={onChangeHandler}
                         required
                     />
                 </div>
+
+                {/* Content Field */}
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Content</label>
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                        Content
+                    </label>
                     <textarea
+                        id="description"
+                        name="description"
                         className="w-full px-4 py-2 border rounded"
                         rows={5}
-                        value={formData.content}
-                        onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                        value={formData.description}
+                        onChange={onChangeHandler}
                         required
                     ></textarea>
                 </div>
+
+                {/* Submit Button */}
                 <button
                     type="submit"
                     className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
@@ -45,4 +77,4 @@ function AddArticleForm() {
     );
 }
 
-export default AddArticleForm
+export default AddArticleForm;

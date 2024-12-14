@@ -16,7 +16,7 @@ model User {
   createAt DateTime  @default(now())
   updateAt DateTime  @updatedAt
   comments Comment[]
-  articles Article[]
+  // articles Article[]
 }
 
 model Article {
@@ -26,8 +26,8 @@ model Article {
   createAt    DateTime  @default(now())
   updateAt    DateTime  @updatedAt
   comments    Comment[]
-  User        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId      Int?
+  // User        User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // userId      Int?
 }
 
 model Comment {

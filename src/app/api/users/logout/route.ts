@@ -1,35 +1,20 @@
-import { verifyToken } from '@/app/Utils/verifyToken';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
+/**
+ *  @method  GET
+ *  @route   ~/api/users/logout
+ *  @desc    Logout User
+ *  @access  public
+ */
+export async function GET() {
     try {
-        const token = request.headers.get('Authorization')?.replace('Bearer ', '')
-
-        if (!token) {
-            return NextResponse.json(
-                { message: 'Token is missing' },
-                { status: 400 }
-            );
-        }
-
-        const userData = verifyToken(request);
-        if (!userData) {
-            return NextResponse.json(
-                { message: 'Invalid token' },
-                { status: 401 }
-            );
-        }
-
-        const response = NextResponse.json(
-            { message: 'Logged out successfully' },
-            { status: 200 }
-        );
-        response.cookies.set('token', '', { maxAge: 0, httpOnly: true }); 
-
+        // Set the `jwtToken` cookie to expire immediately
+        const response = NextResponse.json({ message: 'logout' }, { status: 200 });
+        response.cookies.set('jwtToken', '', { maxAge: 0 }); // Clear the cookie
         return response;
-    } catch  {
+    } catch {
         return NextResponse.json(
-            { message: 'Internal server error' },
+            { message: 'internal server error' },
             { status: 500 }
         );
     }
